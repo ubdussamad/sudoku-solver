@@ -38,8 +38,10 @@ class parser(object): #Loads and defines all the methods which can be
         row_triplet,column_triplet = get_range(pos[0]),get_range(pos[1])
         for i in r[row_triplet]:
             for j in r[column_triplet]:
-                quad_members.append(self.sudoku[i][j])
-        return(list(filter(lambda x:x!="0",quad_members))) #Filter out zeros from the list and return.
+                if int(self.sudoku[i][j]):
+                	quad_members.append(self.sudoku[i][j])
+        return(quad_members)
+        #return(list(filter(lambda x:x!="0",quad_members))) #Filter out zeros from the list and return.
 
     def get_subsections_for_all(self,pos): #Under Construction 
         quad_dim = [3,3] if self.dim==9 else [3,2]
