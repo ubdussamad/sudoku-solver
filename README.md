@@ -1,12 +1,16 @@
 # Sudoku-solver
-Different types of Sudoku solving algorithms and the implimentations in Python3.x.
+Different types of Sudoku solving algorithms and their implimentations in Python3.x.
+
 Currently supports only 9x9 Sudokus but in future other diamentional compatibility
 will be added.
+
 More Implimentaions comnig as soon as i write them.
 
 # Data
 You'll need to provide it with a **9x9** grid of sudoku written in plain text file with any encoding.
+
 A **zero** is placed inplace of a vacant cell to make things easier.
+
 The format can be futher understood by reading **s1** sudoku file.
 
 # Running
