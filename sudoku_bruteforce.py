@@ -27,7 +27,7 @@ class parser(object): #Loads and defines all the methods which can be
         	raise NotImplementedError
     
     def get_subsections(self,pos): #Returns a list of all the numbers present
-        quad_members = []        #in the subsections of the given position (only for 9x9 sudokus).
+        quad_members = []        #in the subsection of the given cell (only for 9x9 sudokus).
         #Divides the columns into triplets and then finds all the numbers in subsection
         r = {i:range(j,k+1) for i,j,k in zip(range(1,4),range(0,7,3),range(2,9,3))}
         
@@ -72,8 +72,6 @@ class parser(object): #Loads and defines all the methods which can be
 
     def get_neighbours(self,pos):
         i,j = pos
-        #print("For neighbours sudoku is:")
-        #self.print_sudoku(self.sudoku)
         neighbours_list = [ self.sudoku[i][k] for k in range(0,self.dim) if int(self.sudoku[i][k])] #Keeping i Constant
         neighbours_list += [ self.sudoku[k][j] for k in range(0,self.dim) if int(self.sudoku[k][j])]
         return list(set( neighbours_list ))
@@ -92,14 +90,14 @@ class parser(object): #Loads and defines all the methods which can be
 
 
 
-
+#Solving Logic
 def solve(z,v=0):
     try:
         pos = z.next()
     except:
         return(0)
 
-    op = z.get_options(pos) #Get the available options
+    op = z.get_options(pos) #Get all the available options
 
     if not(len(op)):
         print("Rolling Back!\n" if v else "",end="")
@@ -127,10 +125,8 @@ def solve(z,v=0):
             continue
         else:
             print("An Unexpected Error occurred!")
-    
-z = parser(loader.sudoku)        
-    
 if __name__ == "__main__":
+	z = parser(loader.sudoku) 
 	initial  = time.time()
 	solve(z,sys.argv[2] if len(sys.argv)>2 else 0)
 	print("Time taken to solve:%.2fs"%(time.time()-initial))
