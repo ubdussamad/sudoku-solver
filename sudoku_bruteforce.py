@@ -61,7 +61,7 @@ class parser(object): #Loads and defines all the methods which can be
         self.current_index += 1
         return self.empty_indices[self.current_index]
     def get_options(self,pos):
-        return [ i for i in self.parent_list if i not in list(set(self.get_neighbours(pos)+self.get_subsections(pos)))]
+        return [ i for i in self.parent_list if i not in set(self.get_neighbours(pos)+self.get_subsections(pos))]
 
     def previous(self):
         self.current_index -= 1
@@ -74,7 +74,7 @@ class parser(object): #Loads and defines all the methods which can be
         i,j = pos
         neighbours_list = [ self.sudoku[i][k] for k in range(0,self.dim) if int(self.sudoku[i][k])] #Keeping i Constant
         neighbours_list += [ self.sudoku[k][j] for k in range(0,self.dim) if int(self.sudoku[k][j])]
-        return list(set( neighbours_list ))
+        return neighbours_list
 
     def p(self):
         print()
