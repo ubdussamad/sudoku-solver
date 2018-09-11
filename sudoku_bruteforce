@@ -22,25 +22,6 @@ class parser(object): #Loads and defines all the methods which can be
         self.prams = []
         self.find_empty_indices()
         print("Hello, Your sudoku grid is:%dx%d and the complexity is: %.2f Percent "%(self.dim,self.dim, (len(self.empty_indices)/(self.dim**2))*100 ) )
-        #if self.dim != 9:
-        #	print("This Solver is only designed for solving 9x9 Sudokus.")
-        #	raise NotImplementedError
-    
-    def get_subsections(self,pos): #Returns a list of all the numbers present
-        quad_members = []        #in the subsection of the given cell (only for 9x9 sudokus).
-        #Divides the columns into triplets and then finds all the numbers in subsection
-        r = {i:range(j,k+1) for i,j,k in zip(range(1,4),range(0,7,3),range(2,9,3))}
-        
-        def get_range(coord):
-            for i in r:
-                if coord in r[i]:
-                    return(i)
-        row_triplet,column_triplet = get_range(pos[0]),get_range(pos[1])
-        for i in r[row_triplet]:
-            for j in r[column_triplet]:
-                if int(self.sudoku[i][j]):
-                	quad_members.append(self.sudoku[i][j])
-        return(quad_members)
 
     def get_subsections_for_all(self,pos): #Under Construction 
         quad_members = []        #in the subsection of the given cell (only for 6x6 sudokus).
