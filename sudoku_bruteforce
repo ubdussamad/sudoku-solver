@@ -23,10 +23,11 @@ class parser(object): #Loads and defines all the methods which can be
         self.find_empty_indices()
         print("Hello, Your sudoku grid is:%dx%d and the complexity is: %.2f Percent "%(self.dim,self.dim, (len(self.empty_indices)/(self.dim**2))*100 ) )
 
-    def get_subsections_for_all(self,pos): #Under Construction 
-        quad_members = []        #in the subsection of the given cell (only for 6x6 sudokus).
-        #Divides the columns into triplets and then finds all the numbers in subsection
-        
+    def get_grid_elements(self,pos):
+        #Returns all the elements inside the grid scope of the given position
+        #(Only works for 6x6 and 9x9 sudokus)
+        #Divides the columns into triplets or duplets and then finds all the numbers in the grid
+        quad_members = []
         def get_range(coord,a,b,parity=0):
             itr = b if parity else a
             for i in itr:
@@ -63,7 +64,7 @@ class parser(object): #Loads and defines all the methods which can be
         self.current_index += 1
         return self.empty_indices[self.current_index]
     def get_options(self,pos):
-        return [ i for i in self.parent_list if i not in set(self.get_neighbours(pos)+self.get_subsections_for_all(pos))]
+        return [ i for i in self.parent_list if i not in set(self.get_neighbours(pos)+self.get_grid_elements(pos))]
 
     def previous(self):
         self.current_index -= 1
