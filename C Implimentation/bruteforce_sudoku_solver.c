@@ -5,9 +5,7 @@ int chr_to_int();
 
 int main(int argc, char **argv){
 	int sudoku[9][9]; //Initialize a 9x9 array
-	printf("\nI happened!");
 	file_handler(&sudoku,argv);
-	printf("\nI happened!\n\n");
 	for (int i=0;i<9;i++){
 		printf("\n");
 		for (int j = 0;j<9;j++){
@@ -19,8 +17,8 @@ int main(int argc, char **argv){
 }
 
 int chr_to_int(int ch){
-	/* Maps integer character bytes to actual interger
-	using ASCII standard.*/ 
+	/* Maps integer character bytes to actual
+	   integers values using ASCII standard.*/ 
 	int list[10] = {48,49,50,51,52,53,54,55,56,57};
 	
 	int get_index(int sch,int * arr){
@@ -48,12 +46,14 @@ int file_handler(int *arr[9][9] , char **argv){
     int counter = 90; //81 Elements + 9 Newline characters.
     int i = 1;
 
-    for (int i = 0; i<9; i++){
+    for (int i = 0; i<9; i++) {
     	for (int j = 0; j<9; j++){
     		char ch = getc(sudoku_ptr);
+    		if (ch != '\n'){
     		int num = (int)ch;
-    		int n = chr_to_int(num);
-    		arr[i][j] = n;
+    		int *n = chr_to_int(num);
+    		arr[i][j] = *n;
+    	}
     	}
     }
     /*
