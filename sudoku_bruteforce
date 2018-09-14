@@ -50,7 +50,6 @@ class parser(object): #Loads and defines all the methods which can be
                 	quad_members.append(self.sudoku[i][j])
         return(quad_members)
         
-
     def find_empty_indices(self):
         for i,j in enumerate(self.sudoku):
             for k,l in enumerate(j):
@@ -90,7 +89,6 @@ class parser(object): #Loads and defines all the methods which can be
 
     def challenge(self):
         return(len(self.empty_indices))
-
 
 counter=0
 #Solving Logic
