@@ -62,6 +62,7 @@ class parser(object): #Loads and defines all the methods which can be
     def next(self): # Calling next for the first time starts the counter and returns first position.
         self.current_index += 1
         return self.empty_indices[self.current_index]
+
     def get_options(self,pos):
         return [ i for i in self.parent_list if i not in set(self.get_neighbours(pos)+self.get_grid_elements(pos))]
 
