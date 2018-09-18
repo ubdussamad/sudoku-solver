@@ -6,8 +6,8 @@
 * 9x9 Sudoku Solver in C
 * 07SEP2018
 * Author: Mohammed S. Haque <ubdussamad@gmail.com>
-* Primarily Built for GCC Compiler but it'll work on 
-* other compilers too.
+* Primarily Built for GCC Compiler but it should
+* work on most other compilers too.
 
 * All arrays end at element having value -1
 * The compiler must have integer size of 4 bytes
@@ -16,6 +16,16 @@
 * ... 4 with the integer size in your machine.
 *///---------------------------------------------
 
+struct node {
+	// The first element will be of 40 bytes , and the other two are 4 and 4 respectively.
+	 //In this case the number of elements provided are the maximum that'll be required for our sudoku job
+	int top; // You can always use malloc or some neat pointer trick to make this array happen with mutable list size
+	int max;
+	int array[10];};
+int push();
+int find();
+void int_memcpy();
+int pop();
 void file_handler();
 int chr_to_int();
 void print_sudoku_ref();
@@ -43,18 +53,25 @@ int main(int argc, char **argv) {
     int empty_indices = count_empty_indices(&sudoku,8);
     struct indices pos [empty_indices];
     get_empty_indices(&sudoku,&pos);
-    //short parent_list[10] = {0,1,2,3,4,5,6,7,8,9};
-    //int current_index = 80;
-    int list[8];
+    int current_index = 80;
     struct indices err;
-    err.r = 7;
-    err.c = 7;
+    for (int i = 0; i < 81; i++)
+    {
+    	if (pos[i].r == -1){break;}
 
-    get_options(err,sudoku,&list);
-
-    print_list(list,8);
+    	printf("Pos are:%d:%d\n",pos[i].r,pos[i].c);
+    }
 
 	return(0);
+}
+
+
+void solve(int * sudoku_ptr , struct indices pos,int * current_index){
+	//Code
+}
+
+void parse_to_stack(int list[] , struct node * struct_ptr){
+	//Code to parse a list to a stack.
 }
 
 void get_options(struct indices pos,int sudoku[9][9],int * list_ptr){
@@ -87,7 +104,7 @@ void get_options(struct indices pos,int sudoku[9][9],int * list_ptr){
 			printf("Option: %d\n",parent_list[i]);
 		}
 	}
-	int_memcpy((int *) dref_ptr , -1 , 4);
+	int_memcpy((int *) dref_ptr , -1 , 4 , 0);
 }
 void get_grid_members(struct indices pos,int sudoku[9][9],int * list_ptr){
 	long unsigned int  dref_ptr = (long unsigned int) list_ptr;
@@ -97,19 +114,19 @@ void get_grid_members(struct indices pos,int sudoku[9][9],int * list_ptr){
 		long unsigned int sub_dref_ptr  = (long unsigned int) ptr;
 		
 		if (coord >= 0 && coord <= 2) {
-			int_memcpy((int *)sub_dref_ptr,0,4);
+			int_memcpy((int *)sub_dref_ptr,0,4,0);
 			sub_dref_ptr += 4;
-			int_memcpy((int *)sub_dref_ptr,2,4);
+			int_memcpy((int *)sub_dref_ptr,2,4,0);
 		}
 		else if (coord >= 3 && coord <= 5) {
-			int_memcpy((int *)sub_dref_ptr,3,4);
+			int_memcpy((int *)sub_dref_ptr,3,4,0);
 			sub_dref_ptr += 4;
-			int_memcpy((int *)sub_dref_ptr,5,4);
+			int_memcpy((int *)sub_dref_ptr,5,4,0);
 		}
 		else if (coord >= 6 && coord <= 8) {
-			int_memcpy((int *)sub_dref_ptr,6,4);
+			int_memcpy((int *)sub_dref_ptr,6,4,0);
 			sub_dref_ptr += 4;
-			int_memcpy((int *)sub_dref_ptr,8,4);
+			int_memcpy((int *)sub_dref_ptr,8,4,0);
 		}
 		else{
 			printf("Locha 404! Bad Coordinates.\n");
@@ -126,7 +143,7 @@ void get_grid_members(struct indices pos,int sudoku[9][9],int * list_ptr){
 				}
 			}
 		}
-	int_memcpy((int *) dref_ptr,-1,4);	
+	int_memcpy((int *) dref_ptr,-1,4,0);	
 }
 void get_arms(struct indices pos,int sudoku[9][9],int * list_ptr){
 	long unsigned int  dref_ptr = (long unsigned int) list_ptr;
@@ -191,6 +208,10 @@ int get_empty_indices(int * sudoku_ptr , int * struct_ptr){
 	long unsigned int dref_ptr = (long unsigned int) sudoku_ptr;
 	long unsigned int int_unref_ptr = (long unsigned int) struct_ptr;
 
+	void modify (long unsigned int unref_ptr,int bytes_to_push,int data){
+					int * ref_ptr = (int *) unref_ptr;
+					memcpy(ref_ptr,&data,bytes_to_push);
+				}
 	for (int i=0;i<9;i++){
 
 		for (int j=0;j<9;j++){
@@ -198,11 +219,6 @@ int get_empty_indices(int * sudoku_ptr , int * struct_ptr){
 			int value = (int)*ref_ptr;
 			if (!value) {
 				/* Pointer Magic Happens */
-				void modify (long unsigned int unref_ptr,int bytes_to_push,int data){
-					int * ref_ptr = (int *) unref_ptr;
-					memcpy(ref_ptr,&data,bytes_to_push);
-				}
-
 				modify(int_unref_ptr,4,i);
 				int_unref_ptr += 4;
 				modify(int_unref_ptr,4,j);
@@ -211,6 +227,11 @@ int get_empty_indices(int * sudoku_ptr , int * struct_ptr){
 			dref_ptr += 4;
 		}
 	}
+	int end=-1;
+	modify(int_unref_ptr,4,end);
+	int_unref_ptr += 4;
+	modify(int_unref_ptr,4,end);
+	int_unref_ptr += 4;
 	return(0);
 }
 int count_empty_indices(int * sudoku_ptr,int dim){
@@ -285,7 +306,34 @@ void print_list(int list[],int range){
 	}
 	printf("]\n");
 }
-void int_memcpy(int * reciever,int value,int bytes){
+
+int push(int * initial_struct_node_ptr,int value){
+
+	if ((find(initial_struct_node_ptr,0)) >= find(initial_struct_node_ptr,4)){
+		printf("OverPheloww!\n");
+		return(-1);
+	}
+
+	int_memcpy(initial_struct_node_ptr , value , sizeof(int) , (8+(find (initial_struct_node_ptr , 0)*4)) );
+	int_memcpy(initial_struct_node_ptr , find (initial_struct_node_ptr , 0) + 1 , sizeof(int) , 0);
+
+	return(0);
+}
+
+int pop(int * initial_struct_node_ptr){
+	if (!find(initial_struct_node_ptr ,0)){
+		printf("UnderFlow\n");
+		return(-1);
+	}
+	int_memcpy(initial_struct_node_ptr , find (initial_struct_node_ptr , 0) - 1 , sizeof(int) , 0);
+	return(find(initial_struct_node_ptr , (8 + (find(initial_struct_node_ptr , 0))*4 )));
+}
+
+int find(int * addr,int bytes_to_skip){
+	return (*((int *)((long unsigned int)addr + bytes_to_skip)));
+}
+
+void int_memcpy(int * reciever,int value,size_t bytes_to_copy,int bytes_to_skip){
 	//Copies bytes from value to receiver
-	memcpy(reciever,&value,bytes);
+	memcpy( (int *)((long unsigned int)reciever+bytes_to_skip),&value,bytes_to_copy);
 }
