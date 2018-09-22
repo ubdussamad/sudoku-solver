@@ -19,7 +19,7 @@
 struct node {
 	// The first element will be of 40 bytes , and the other two are 4 and 4 respectively.
 	 //In this case the number of elements provided are the maximum that'll be required for our sudoku job
-	int top; // You can always use malloc or some neat pointer trick to make this array happen with mutable list size
+	int top; // You can always use malloc or some neat pointer trick to make this node with mutable list size
 	int max;
 	int array[10];};
 int push();
@@ -43,40 +43,150 @@ struct indices current();
 void get_grid_members();
 void int_memcpy();
 void get_options();
+void parse_to_stack();
+int solve();
+int step_counter = 0;
 
 int main(int argc, char **argv) {
 	int dim = 9;
     int sudoku[dim][dim]; //Initialize a 9x9 array
     file_handler(&sudoku,dim,argv);
-    print_sudoku_ref(&sudoku,dim,8,0);
+    //sprint_sudoku_ref(&sudoku,dim,8,0);
 
     int empty_indices = count_empty_indices(&sudoku,8);
+    
     struct indices pos [empty_indices];
+    
     get_empty_indices(&sudoku,&pos);
-    int current_index = 80;
-    struct indices err;
-    for (int i = 0; i < 81; i++)
-    {
-    	if (pos[i].r == -1){break;}
 
-    	printf("Pos are:%d:%d\n",pos[i].r,pos[i].c);
+    int current_index = -1;
+
+    //printf("The ptr to sudoku outside is:%x\n",&sudoku[0][0]);
+    //printf("The number of empty indices are:%d\n", empty_indices);
+    printf("\nHi your sudoku dimention is: 9x9 and Complexity is:%f\n",(float)((float)empty_indices/(float)81));
+    int z = solve(&sudoku , &current_index , empty_indices , &pos );
+
+    if (z==-1){
+    	printf("Could Not Solve you grid, please check for errors in your grid.\n");
     }
+    else {
+    	printf("It took %d steps to complete your task.\n",step_counter);
+    }
+	print_sudoku_ref(&sudoku,dim,8,0); 
+
+	//printf("\n");   
 
 	return(0);
 }
 
 
-void solve(int * sudoku_ptr , struct indices pos,int * current_index){
+int solve( int * sudoku_ptr[9][9] , int * current_index  , int empty_indices , struct indices ** pos){
 	//Code
+
+	//Checking for termination state
+	step_counter++;
+	struct indices coord = next(current_index , pos , empty_indices);
+
+	if (coord.r == -1){
+		return(0);
+	}
+
+	// Done.
+
+	// Getting Options
+	int options[10];
+	//printf("Good before this.\n");
+	get_options( coord , sudoku_ptr , &options);
+
+	printf("Current Position is: [%d,%d] and current options are: ",coord.r,coord.c);
+	print_list(options,9);
+
+	struct node stack;
+	stack.top = 0;
+	stack.max = 10;
+
+	parse_to_stack(options,&stack);
+
+	//Done Getting Options and options are stored in stack
+
+	//Rolling back if there are no options.
+	
+	if ( stack.top == 0 ){
+		printf("Rolling Back!. No choice is there.\n");
+
+		set_index ( previous( current_index , pos , empty_indices ) , current_index , pos , 8 );
+		
+		return(-1);
+	}
+
+	//Done Rolling back stuff
+
+	while (1){
+
+	printf("Top was: %d\n",stack.top);
+
+
+	if ( stack.top == 0 ){
+		
+		printf("Rolling back! No Choices Left.\n");
+		int_memcpy(sudoku_ptr,0,4, ((coord.r*36)+(coord.c*4)) );
+		set_index ( previous( current_index , pos , empty_indices ) , current_index , pos , 8 );
+		return(-1);
+	}
+
+	int ch = pop(&stack);
+
+	printf("We chose:%d\n",ch);
+	
+	//printf("The ptr to sudoku inside is:%x\n",sudoku_ptr);
+
+	int_memcpy(sudoku_ptr,ch,4, ((coord.r*36)+(coord.c*4)) );
+	
+	//*sudoku_ptr[coord.r][coord.c] = ch;
+
+	//printf("We assigned the value at that index!\n");
+
+	int call = solve(sudoku_ptr , current_index , empty_indices , pos);
+
+	if (call == 0){
+		return(0);
+	}
+
+	else if (call == -1) {
+		continue;
+	}
+
+	else {
+		printf("Error Occurred!\n");
+	}
 }
+
+}
+
 
 void parse_to_stack(int list[] , struct node * struct_ptr){
-	//Code to parse a list to a stack.
-}
+	int counter;
+	for (int i = 0; i < 10; i++)
+	{
+		if (list[i] == -1){
+			counter= i;
+			break;
+		}
 
+	}
+
+	int_memcpy(struct_ptr , counter , 4 , 4); //Modifying the max value of struct to the length of the list.
+
+	for (int i = 0; i < counter; i++)
+	{
+		//printf("Val:%d\n",list[i]);
+		//int_memcpy( struct_ptr , list[i] , 4 , (8+(i*4)) );
+		push(struct_ptr , list[i]);
+	}
+}
 void get_options(struct indices pos,int sudoku[9][9],int * list_ptr){
 	long unsigned int dref_ptr = (long unsigned int) list_ptr;
-	printf("\nAt Position: %d:%d\n",pos.r,pos.c);
+	//printf("\nAt Position: %d:%d\n",pos.r,pos.c);
 	int grid[8];
 	int arms[17];
 	get_grid_members(pos,sudoku,&grid[0]);
@@ -101,7 +211,7 @@ void get_options(struct indices pos,int sudoku[9][9],int * list_ptr){
 		if (!used){
 			memcpy((int *)dref_ptr , &parent_list[i] , 4);
 			dref_ptr += 4;
-			printf("Option: %d\n",parent_list[i]);
+			//printf("Option: %d\n",parent_list[i]);
 		}
 	}
 	int_memcpy((int *) dref_ptr , -1 , 4 , 0);
@@ -174,7 +284,7 @@ struct indices current(int current_index,struct indices indices_list[]){
 struct indices previous(int *current_index,struct indices list[],int max){
 	if (*current_index >= 1) {
 		
-		*current_index -=0;
+		*current_index -=1;
 		return(list[*current_index]);	
 	}
 	struct indices err;
@@ -298,7 +408,7 @@ void file_handler(int * arr,int dim, char **argv){
     }
 }
 void print_list(int list[],int range){
-	printf("\n[");
+	printf("[");
 	for (int i = 0; i < range; i++)
 	{
 		if (list[i] == -1){break;}
@@ -306,7 +416,6 @@ void print_list(int list[],int range){
 	}
 	printf("]\n");
 }
-
 int push(int * initial_struct_node_ptr,int value){
 
 	if ((find(initial_struct_node_ptr,0)) >= find(initial_struct_node_ptr,4)){
@@ -319,7 +428,6 @@ int push(int * initial_struct_node_ptr,int value){
 
 	return(0);
 }
-
 int pop(int * initial_struct_node_ptr){
 	if (!find(initial_struct_node_ptr ,0)){
 		printf("UnderFlow\n");
@@ -328,11 +436,9 @@ int pop(int * initial_struct_node_ptr){
 	int_memcpy(initial_struct_node_ptr , find (initial_struct_node_ptr , 0) - 1 , sizeof(int) , 0);
 	return(find(initial_struct_node_ptr , (8 + (find(initial_struct_node_ptr , 0))*4 )));
 }
-
 int find(int * addr,int bytes_to_skip){
 	return (*((int *)((long unsigned int)addr + bytes_to_skip)));
 }
-
 void int_memcpy(int * reciever,int value,size_t bytes_to_copy,int bytes_to_skip){
 	//Copies bytes from value to receiver
 	memcpy( (int *)((long unsigned int)reciever+bytes_to_skip),&value,bytes_to_copy);
